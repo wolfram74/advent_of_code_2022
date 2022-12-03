@@ -6,13 +6,17 @@ sum all scores
 '''
 
 def parse_group(sacks):
-	sack0 = set(sacks[0])
-	sack1 = set(sacks[1])
-	sack2 = set(sacks[2])
-	for item in sack0:
-		if item in sack1 and item in sack2:
-			print(item)
+	set_sacks = [set(sack) for sack in sacks]
+
+	for item in set_sacks[0]:
+		badge = True
+		for sack in set_sacks[1:]:
+			if item not in sack:
+				badge =False
+				break
+		if badge:
 			return item
+
 
 def score_item(letter):
 	ord_val = ord(letter)
