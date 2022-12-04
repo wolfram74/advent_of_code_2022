@@ -8,7 +8,7 @@ def parse_pair(pair):
     return assignment
 
 def is_enclosed(pair):
-    if pair[0][0]<pair[1][0] and pair[0][1] > pair[1][1]:
+    if pair[0][0] <= pair[1][0] and pair[0][1] >= pair[1][1]:
         return True
     if pair[0][0] >= pair[1][0] and pair[0][1] <= pair[1][1]:
         return True        
