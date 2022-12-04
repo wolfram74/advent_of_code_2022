@@ -12,6 +12,10 @@ def overlaps(pair):
         return True
     if inside_bounds(pair[0][1], pair[1]) :
         return True
+    if inside_bounds(pair[1][0], pair[0]) :
+        return True
+    if inside_bounds(pair[1][1], pair[0]) :
+        return True
     return False
 
 def inside_bounds(subject, bounds):
