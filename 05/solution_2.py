@@ -11,13 +11,13 @@ def init_stack_state(crane_plan):
         raw_lines.append(line.rstrip())
 
     for line in raw_lines:
+        cleaned = list(line[1::4]) #crate label is always in 4th column
         for index, stack in enumerate(crates_state):
-            slot = index*4+1 #letter value is always in same column of text
-            if slot >= len(line):
+            if index >= len(cleaned):
                 continue
-            if line[slot] == ' ':
+            if cleaned[index] == ' ':
                 continue
-            stack.append(line[slot])
+            stack.append(cleaned[index])
 
     return crates_state
 
@@ -26,7 +26,6 @@ def parse_instruction(line):
     values = [1,3,5]
     words = line.split(' ')
     output = [int(words[el]) for el in values]
-    # print(output)
     return output
 
 def crane_operation(state, instruction):
