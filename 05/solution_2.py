@@ -4,9 +4,9 @@ def init_stack_state(crane_plan):
     content = True
     while content:
         line = crane_plan.readline()
-        if line.rstrip()=='':
+        if line.rstrip()=='': #blank line before instructions start
             break
-        if line[0] == ' ':
+        if line[0] == ' ': #stack labels, no information
             continue
         raw_lines.append(line.rstrip())
 
