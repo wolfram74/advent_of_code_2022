@@ -29,10 +29,9 @@ def parse_instruction(line):
     return output
 
 def crane_operation(state, instruction):
-    #move 3 from 8 to 9
+    #move 3 from 8 to 9 -> [3,8,9]
     #crate indices are 0 indexed instead of 1 indexed, so a minus 1 will happen
-
-    #pop(0) from crate 8-1, insert(0) resulting element onto crate 9-1, do so 3 times
+    #take top 3 elements from 8-1 and put them on top of 9-1, in order
     crates = instruction[0]
     origin = instruction[1]-1
     destination = instruction[2]-1
