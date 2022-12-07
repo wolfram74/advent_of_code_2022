@@ -10,6 +10,7 @@ def init_stack_state(crane_plan):
             continue
         raw_lines.append(line.rstrip())
 
+
     for line in raw_lines:
         cleaned = list(line[1::4]) #crate label is always in 4th column
         for index, stack in enumerate(crates_state):
