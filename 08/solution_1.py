@@ -36,7 +36,7 @@ def count_visibles(tree_grid):
                 tallest_back = tree_line[-1-check_index]
             print(tallest_front, tallest_back)
             check_index+=1
-            if check_index > height/2+1:
+            if check_index > height-1:
                 break
 
     for col in range(width):
@@ -54,7 +54,7 @@ def count_visibles(tree_grid):
                 tallest_back = tree_line[-1-check_index]
             print(tallest_front, tallest_back)
             check_index+=1
-            if check_index > height/2+1:
+            if check_index > height-1:
                 break
 
     print_grid(visibility_map)
