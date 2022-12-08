@@ -1,7 +1,11 @@
 class Directory:
-    def __init__(self, name, parent):
+    def __init__(self, name, parent_address):
         self.name = name
-        self.parent = parent
+        self.parent_address = parent_address
+        if parent_address:
+            self.address = '-'.join([parent_address, name])
+        else:
+            self.address = name
         self.size = 0
         self.level = 0
         self.sub_directories = {}
@@ -17,9 +21,9 @@ class Directory:
 
 
 class File:
-    def __init__(self, name, parent, size):
+    def __init__(self, name, parent_address, size):
         self.name = name
-        self.parent = parent
+        self.parent_address = parent_address
         self.size = size
 
 
@@ -28,25 +32,27 @@ def generate_file_tree(command_log):
     folder_dict = {}
     pwd_name = '/'
     deepest_level = 0
-    folder_dict[pwd_name] = Directory(pwd_name, parent = None)
+    folder_dict[pwd_name] = Directory(pwd_name, parent_address = None)
     pwd = folder_dict[pwd_name]
     print(folder_dict[pwd_name].name)
     while True:
         line_feed = command_log.readline().rstrip().split(' ')
-        # print(line_feed)
+        print(line_feed)
         # starts with either $, dir or an int
         # int is easy, add file directory
         # dir is also easy, add blank directory to directory
+        # directory names are not unique
         # cd
         if line_feed[0] == '':
             break
         if line_feed[0] == 'dir':
             new_folder = Directory(
-                name=line_feed[1], parent=pwd_name
+                name=line_feed[1],
+                parent_address=pwd.address
                 )
-            if new_folder.name in folder_dict:
+            if new_folder.address in folder_dict:
                 print('oh fuck')
-            folder_dict[new_folder.name] = new_folder
+            folder_dict[new_folder.address] = new_folder
             pwd.add_directory(new_folder)
             continue
         if line_feed[0] == '$':
@@ -54,15 +60,25 @@ def generate_file_tree(command_log):
                 continue
             pwd_name = line_feed[2]
             if pwd_name == '..':
-                pwd_name = pwd.parent
-            pwd = folder_dict[pwd_name]
+                pwd_name = pwd.parent_address
+                pwd = folder_dict[pwd_name]
+                continue
+
+            # print(pwd.name, pwd_name)
+            # print(pwd.name, pwd.sub_directories.keys(), pwd_name)
+            # print(pwd.sub_directories[pwd_name].address)
+
+            # print(folder_dict.keys())
+            target_address = pwd.sub_directories[pwd_name].address
+
+            pwd = folder_dict[target_address]
             if pwd.level > deepest_level:
                deepest_level = pwd.level 
             continue
         file_size = int(line_feed[0])
         file_name = line_feed[1]
         new_file = File(
-            name=file_name, size=file_size, parent=pwd_name
+            name=file_name, size=file_size, parent_address=pwd.address
             )
         pwd.add_file(new_file)
     print(pwd.files)
@@ -79,7 +95,7 @@ def include_directory_size(folder_dict):
     directories_by_level = [[] for el in range(8)]
     for dir_name in folder_dict.keys():
         directory = folder_dict[dir_name]
-        directories_by_level[directory.level].append(directory.name)
+        directories_by_level[directory.level].append(directory.address)
     for level in directories_by_level:
         print(level)
 
