@@ -35,6 +35,7 @@ def generate_file_tree(command_log):
     folder_dict[pwd_name] = Directory(pwd_name, parent_address = None)
     pwd = folder_dict[pwd_name]
     print(folder_dict[pwd_name].name)
+    total_file_size = 0
     while True:
         line_feed = command_log.readline().rstrip().split(' ')
         print(line_feed)
@@ -76,6 +77,7 @@ def generate_file_tree(command_log):
                deepest_level = pwd.level 
             continue
         file_size = int(line_feed[0])
+        total_file_size += file_size
         file_name = line_feed[1]
         new_file = File(
             name=file_name, size=file_size, parent_address=pwd.address
@@ -84,7 +86,7 @@ def generate_file_tree(command_log):
     print(pwd.files)
     print(pwd.size)
     print(pwd.level)
-    print(deepest_level)
+    print(deepest_level, total_file_size)
     # print(folder_dict.keys())
     return folder_dict
 
@@ -96,8 +98,12 @@ def include_directory_size(folder_dict):
     for dir_name in folder_dict.keys():
         directory = folder_dict[dir_name]
         directories_by_level[directory.level].append(directory.address)
-    for level in directories_by_level:
-        print(level)
+    for level in range(7, 0, -1):
+        directory_tier = directories_by_level[level]
+        for address in directory_tier:
+            folder = folder_dict[address]
+            parent = folder_dict[folder.parent_address]
+            parent.size+=folder.size
 
         
 if __name__ == '__main__':
