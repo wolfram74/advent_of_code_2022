@@ -34,11 +34,11 @@ def generate_file_tree(command_log):
     deepest_level = 0
     folder_dict[pwd_name] = Directory(pwd_name, parent_address = None)
     pwd = folder_dict[pwd_name]
-    print(folder_dict[pwd_name].name)
+    # print(folder_dict[pwd_name].name)
     total_file_size = 0
     while True:
         line_feed = command_log.readline().rstrip().split(' ')
-        print(line_feed)
+        # print(line_feed)
         # starts with either $, dir or an int
         # int is easy, add file directory
         # dir is also easy, add blank directory to directory
@@ -105,6 +105,13 @@ def include_directory_size(folder_dict):
             parent = folder_dict[folder.parent_address]
             parent.size+=folder.size
 
+def files_under_threshold(folder_dict, threshold):
+    total_size = 0
+    for address in folder_dict.keys():
+        folder = folder_dict[address]
+        if folder.size <= threshold:
+            total_size+= folder.size
+    print(total_size)
         
 if __name__ == '__main__':
     with open('input.txt', 'r') as command_log:
@@ -115,6 +122,6 @@ if __name__ == '__main__':
         print(folder_dict['/'].size)
         include_directory_size(folder_dict)
         print(folder_dict['/'].size)
-
+        files_under_threshold(folder_dict, 100000)
 
 
