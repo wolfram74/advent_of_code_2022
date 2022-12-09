@@ -17,7 +17,8 @@ def mag2(v1):
     return sum([el**2 for el in v1])
 
 def half_size(v1):
-    return tuple([ceil(el/2) for el in v1])
+    trunk = lambda x: x if x%2>0 else int(x/2)
+    return tuple([trunk(el) for el in v1])
 
 
 def reconstruct_head_path(head_moves):
@@ -69,15 +70,19 @@ def construct_tail_path(head_path):
             )
     return tail_path
 
+def plot_tail():
+    pass
+
 if __name__ == '__main__':
     with open('input.txt', 'r') as head_moves:
+    # with open('test_input.txt', 'r') as head_moves:
 
         # print(vector_add((1,2), (4,3)))
         head_path = reconstruct_head_path(head_moves)
         # print(head_path[:15])
         tail_path = construct_tail_path(head_path)
         # print(tail_path[:15])
-        # for step in range(15):
-        #     print(head_path[step], tail_path[step], vector_diff(head_path[step], tail_path[step]))
+        for step in range(25):
+            print(head_path[step], tail_path[step], vector_diff(head_path[step], tail_path[step]))
         print(len(head_path), len(tail_path), len(set(tail_path)))
         # 6252 is too high
