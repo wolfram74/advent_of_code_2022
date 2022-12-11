@@ -26,11 +26,23 @@ def signal_strength_calculator(x_reg):
     print(total)
     pass
 
+def render_register(x_reg):
+    screen = [ ['.' for el in range(40)] for el in range(6)]
+    for ind in range(len(x_reg)):
+        y, x = int(ind/40), ind%40
+        reg_val = x_reg[ind]
+        # print(ind, (y,x), reg_val)
+        if abs(x-reg_val) <= 1:
+            screen[y][x] = '#'
+    for line in screen:
+        print(''.join(line))
+
 if __name__ == '__main__':
-    with open('input.txt', 'r') as command_log:
+    with open('input.txt', 'r') as command_log: #
     # with open('test_input.txt', 'r') as command_log: #13140 result
 
         x_reg_history = reconstruct_reg_history(command_log)
-        print(x_reg_history[:10])
+        # print(x_reg_history[:10])
         print(len(x_reg_history))
-        signal_strength_calculator(x_reg_history) #3740 is too low
+        # signal_strength_calculator(x_reg_history) #3740 is too low
+        render_register(x_reg_history) #PBZGRAZA
