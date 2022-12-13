@@ -1,4 +1,6 @@
-
+# no division is happening now
+# the passing test only depends on what factors a number has
+# truncate numbers into product of each test_num to keep sizes manageable?
 class Monkey():
     def __init__(self, 
         ID_num, items, operation, test_num, recipients
@@ -17,6 +19,7 @@ class Monkey():
         while self.items:
             current = self.items.pop(0)
             new_val = int( self.operation(current)/3 )
+            # new_val = int( self.operation(current) )
             if new_val%self.test_num == 0:
                 self.truthy.append(new_val)
                 continue
@@ -78,6 +81,11 @@ def do_round(monkeys):
         monkeys[monkey.recipients[1]].items += monkey.falsey
     return monkeys
 
+def clean_items(monkeys, space):
+    for monkey in monkeys:
+        monkey.items = [item%space for item in monkey.items]
+    return monkeys
+
 def inspect_items(monkeys):
     for monkey in monkeys:
         print(monkey.items)
@@ -89,16 +97,23 @@ def find_monkey_business(monkeys):
 
 
 if __name__ == '__main__':
-    with open('input.txt', 'r') as monkey_census: # 
-    # with open('test_input.txt', 'r') as monkey_census: # expect 10605
+    with open('input.txt', 'r') as monkey_census: #
+    # with open('test_input.txt', 'r') as monkey_census: #
 
         monkeys = build_monkeys(monkey_census)
         # monkeys[0].evaluate_items()
         # print(monkeys[0].truthy)
         # print(monkeys[0].falsey)
         inspect_items(monkeys)
+        test_nums = [monkey.test_num for monkey in monkeys]
+        space = 1
+        for num in test_nums:
+            space *= num
+
         for loop in range(20):
             monkeys = do_round(monkeys)
+            monkeys = clean_items(monkeys, space)
             inspect_items(monkeys)
-        find_monkey_business(monkeys) # 91760 is too high, 
+        inspect_items(monkeys)
+        find_monkey_business(monkeys) # 91760 is too high 
 
