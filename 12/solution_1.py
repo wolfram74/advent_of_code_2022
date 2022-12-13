@@ -52,7 +52,8 @@ def navigate(terrain, termini):
     dead_paths = []
     attempts = 0
     while paths:
-        if attempts > 1000:
+        if attempts > 50000:
+            print('panic escape-------------------')
             break
         attempts += 1
         next_path = paths.pop(0)
@@ -133,8 +134,8 @@ def valid_steps(terrain, location):
 
 
 if __name__ == '__main__':
-    # with open('input.txt', 'r') as map_data: # 
-    with open('test_input.txt', 'r') as map_data: # expect 31
+    with open('input.txt', 'r') as map_data: # 
+    # with open('test_input.txt', 'r') as map_data: # expect 31
 
         terrain, termini = build_terrain(map_data)
         path = navigate(terrain, termini)
