@@ -104,7 +104,14 @@ def navigate(terrain, termini):
             # old_lens = list(map((lambda pat: pat.index(option) if option in pat else None), paths))
             # print(old_lens)
             # paths.append(next_path+[option])
+    if len(finished_paths)==0:
+        # print('finished with no paths')
+        return 10**6
+    if len(finished_paths)>1:
+        print('finished with extra paths---------')
+        return [len(path)-1 for path in finished_paths]
 
+    # print('finished with %d paths' % len(finished_paths))
 
     # for path in paths:
     #     print(path)
@@ -142,12 +149,16 @@ def valid_steps(terrain, location):
 
 
 if __name__ == '__main__':
-    # with open('input.txt', 'r') as map_data: # 
-    with open('test_input.txt', 'r') as map_data: # expect 6 starts, shortest 29
+    with open('input.txt', 'r') as map_data: # should beat 380
+    # with open('test_input.txt', 'r') as map_data: # expect 6 starts, shortest 29
 
         terrain, end_point, start_points = build_terrain(map_data)
+        lengths = []
         for start in start_points:
             print(start)
             path = navigate(terrain, (start, end_point))
-            print(path)
+            if path < 400:
+                lengths.append(path)
+        print(lengths)
+        print(sorted(lengths))
         # print(valid_steps(terrain, (0,2))) # should have two elements in it for test input
