@@ -18,8 +18,8 @@ class Monkey():
         self.monkey_level+= len(self.items)
         while self.items:
             current = self.items.pop(0)
-            new_val = int( self.operation(current)/3 )
-            # new_val = int( self.operation(current) )
+            # new_val = int( self.operation(current)/3 )
+            new_val = int( self.operation(current) )
             if new_val%self.test_num == 0:
                 self.truthy.append(new_val)
                 continue
@@ -110,10 +110,12 @@ if __name__ == '__main__':
         for num in test_nums:
             space *= num
 
-        for loop in range(20):
+        for loop in range(10000):
             monkeys = do_round(monkeys)
             monkeys = clean_items(monkeys, space)
-            inspect_items(monkeys)
+            if loop%1000 ==0:
+                inspect_items(monkeys)
+                find_monkey_business(monkeys) 
         inspect_items(monkeys)
-        find_monkey_business(monkeys) # 91760 is too high 
+        find_monkey_business(monkeys) # 
 
