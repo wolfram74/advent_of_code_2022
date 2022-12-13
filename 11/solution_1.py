@@ -16,7 +16,7 @@ class Monkey():
         self.monkey_level+= len(self.items)
         while self.items:
             current = self.items.pop(0)
-            new_val = round( self.operation(current)/3 )
+            new_val = int( self.operation(current)/3 )
             if new_val%self.test_num == 0:
                 self.truthy.append(new_val)
                 continue
@@ -44,13 +44,18 @@ def parse_entry(lines):
     items = [int(el) for el in items]
 
     if '+' in lines[2]:
-        operation = lambda x: x + int(lines[2][-1])
+        delta = int(lines[2].split('+')[-1])
+        print('+', delta)
+        operation = lambda x: x + delta
     else:
         if lines[2][-3:] == 'old':
-            print(ID_num)
+            # print(ID_num, '**')
             operation = lambda x: x**2
         else:
-            operation = lambda x: x * int(lines[2][-1])
+            factor = int(lines[2].split('*')[-1])
+            # print('*', factor)
+
+            operation = lambda x: x * factor
 
 
     test_num = int(lines[3].split('by')[-1])
@@ -85,15 +90,15 @@ def find_monkey_business(monkeys):
 
 if __name__ == '__main__':
     with open('input.txt', 'r') as monkey_census: #
-    # with open('test_input.txt', 'r') as command_log: #13140 result
+    # with open('test_input.txt', 'r') as monkey_census: #
 
         monkeys = build_monkeys(monkey_census)
         # monkeys[0].evaluate_items()
         # print(monkeys[0].truthy)
         # print(monkeys[0].falsey)
-        for loop in range(20):
-            # inspect_items(monkeys)
-            monkeys = do_round(monkeys)
         inspect_items(monkeys)
+        for loop in range(20):
+            monkeys = do_round(monkeys)
+            inspect_items(monkeys)
         find_monkey_business(monkeys) # 91760 is too high
 
