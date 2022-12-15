@@ -13,6 +13,7 @@ def extract_pairs(stream):
         pair.append(eval(line))
         line = data_stream.readline()    
         # print(parse_string(list(line)))
+    output.append(pair)
     return output    
   
 def is_ordered(pair):
@@ -75,8 +76,8 @@ def stream_diagnostic(pairs):
     print(index_sum)
 
 if __name__ == '__main__':
-    # with open('input.txt', 'r') as data_stream: # 
-    with open('test_input.txt', 'r') as data_stream: # expect 13
+    with open('input.txt', 'r') as data_stream: # 
+    # with open('test_input.txt', 'r') as data_stream: # expect 13
         pairs = extract_pairs(data_stream)
-        stream_diagnostic(pairs)
-        # print(valid_steps(terrain, (0,2))) # should have two elements in it for test input
+        stream_diagnostic(pairs) #5922 is too low
+
