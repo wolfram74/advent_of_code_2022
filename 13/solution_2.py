@@ -1,3 +1,5 @@
+from functools import cmp_to_key
+
 def extract_pairs(stream):
     output = []
     pair = []
@@ -16,7 +18,7 @@ def extract_pairs(stream):
     output.append(pair)
     return output    
   
-def is_ordered(pair):
+def is_ordered(list0, list1):
     '''
     ways to return True:
         two intgers are compared and I0 < I1
@@ -25,10 +27,10 @@ def is_ordered(pair):
     '''
     # print(pair)
     # print(pair[1])
-    for index in range(len(pair[1])): #second list should be longer
+    for index in range(len(list1)): #second list should be longer
         try:
-            item0 = pair[0][index]
-            item1 = pair[1][index]
+            item0 = list0[index]
+            item1 = list1[index]
         except IndexError as e:
             # print('L0 is shorter than L1, should be truthy')
             # print(e)
@@ -52,12 +54,12 @@ def is_ordered(pair):
             next_pair = (item0, [item1])
             # print('fart', item0, item1)
         
-        result = is_ordered(next_pair)
+        result = is_ordered(next_pair[0], next_pair[1])
         if result == 'continue':
             continue
         return result
 
-    if len(pair[1])<len(pair[0]):
+    if len(list1)<len(list0):
         # print('L1 shorter than L0, should be falsey')
         return False
     # print('same length unresolved')
@@ -69,16 +71,33 @@ def stream_diagnostic(pairs):
 
         # print(pair[0])  
         # print(pair[1])
-        ordered = is_ordered(pair)
+        ordered = is_ordered(pair[0], pair[1])
+        print(ordered)
         if ordered:
             index_sum+=(index+1)
         # print('-----')
     print(index_sum)
 
+def order_wrap(el0, el1):
+    if is_ordered(el0, el1):
+        return 1
+    return -1
+
+def flatten_stream(pairs):
+    output = [[[2]], [[6]]]
+    for pair in pairs:
+        output.append(pair[0])
+        output.append(pair[1])
+    return output
 
 if __name__ == '__main__':
     with open('input.txt', 'r') as data_stream: # 
-    # with open('test_input.txt', 'r') as data_stream: # expect 13
+    # with open('test_input.txt', 'r') as data_stream: # expect 13, part2 140
         pairs = extract_pairs(data_stream)
-        stream_diagnostic(pairs) #5922 is too low
-
+        # stream_diagnostic(pairs) #5922 is too low
+        flat_stream = flatten_stream(pairs)
+        ordered_stream = sorted(flat_stream, key=cmp_to_key(order_wrap), reverse=True)
+        # print(ordered_stream)
+        print((ordered_stream.index([[2]])+1)*(ordered_stream.index([[6]])+1))
+        # for packet in ordered_stream:
+        #     print(packet) 
