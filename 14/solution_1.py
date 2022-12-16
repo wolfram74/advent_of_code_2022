@@ -31,8 +31,8 @@ def make_terrain(rock_scan):
                 min_Y = y
             path.append(vertex)
         rock_lines.append(path)
-    print(min_X, max_X, max_X-min_X, 500-min_X)
-    print(min_Y, max_Y)
+    # print(min_X, max_X, max_X-min_X, 500-min_X)
+    # print(min_Y, max_Y)
     width = max_X-min_X+1
     x_offset = min_X
     height = max_Y+1
@@ -41,31 +41,60 @@ def make_terrain(rock_scan):
 
 def array_generator(rock_lines, width, height, x_offset):
     blanks = [['_' for x in range(width)] for y in range(height)]
-    draw_terrain(blanks)
     for path in rock_lines:
         for index, vert in enumerate(path[:-1]):
             shift = vector_diff(vert, path[index+1])
             draw = [vert[0]-x_offset, vert[1]]
-            print(vert, path[index+1], shift)
-            print(draw)
+            # print(vert, path[index+1], shift)
+            # print(draw)
             blanks[draw[1]][draw[0]] = 'X'
 
             hat, scale = units(shift)
             for i in range(scale):
                 draw = vector_diff(draw, hat)
                 blanks[draw[1]][draw[0]] = 'X'
-            draw_terrain(blanks)
-
-        print('---')
-    pass
+    return blanks
 
 def draw_terrain(field):
     for line in field:
         print(''.join(line))
 
+def drop_sand(field, x_offset):
+    location = (500-x_offset, 0)
+    searching = True
+    while searching:
+        test_1 = vector_add(location, (0,1))
+        if field[test_1[1]][test_1[0]] == '_':
+            location = test_1
+            continue
+
+        test_2 = vector_add(location, (-1,1))
+        if field[test_2[1]][test_2[0]] == '_':
+            location = test_2
+            continue
+
+        test_3 = vector_add(location, (1,1))
+        if field[test_3[1]][test_3[0]] == '_':
+            location = test_3
+            continue
+        field[location[1]][location[0]] = 'O'
+        searching = False
+    return field
+
 if __name__ == '__main__':
     # with open('input.txt', 'r') as rock_scan: # 
     with open('test_input.txt', 'r') as rock_scan: # expect 24
-        rock_map = make_terrain(rock_scan)
+        rock_map, x_offset = make_terrain(rock_scan)
+        draw_terrain(rock_map)
+        sands = 0
+        while True:
+            try:
+                rock_map = drop_sand(rock_map, x_offset)
+                sands+=1
+            except:
+                break
+        draw_terrain(rock_map)
+        print(sands)
+
         # stream_diagnostic(pairs) #5922 is too low
 
