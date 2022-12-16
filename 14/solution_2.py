@@ -35,8 +35,8 @@ def make_terrain(rock_scan):
     # print(min_Y, max_Y)
     height = max_Y+1+2 # with the way the sand falls the width can't be more twice height 
     # width = max_X-min_X+1
-    width = 2*height
-    x_offset = 500-height
+    width = 2*height+8
+    x_offset = 500-int(width/2)
     print(width, height, x_offset)
     return array_generator(rock_lines, width, height, x_offset), x_offset
 
@@ -64,7 +64,7 @@ def draw_terrain(field):
 def drop_sand(field, x_offset):
     location = (500-x_offset, 0)
     searching = True
-    if field[location[1]][location[0]] == 'O':
+    if not field[location[1]][location[0]] == '_':
         return field, False
     while searching:
         test_1 = vector_add(location, (0,1))
@@ -81,24 +81,46 @@ def drop_sand(field, x_offset):
         if field[test_3[1]][test_3[0]] == '_':
             location = test_3
             continue
-        field[location[1]][location[0]] = 'O'
+        field[location[1]][location[0]] = '|'
         searching = False
     return field, True
 
+def count_rocks(terrain):
+    rocks = 0
+    for line in terrain:
+        for col in line:
+            if col=='X':
+                rocks+=1
+    print(rocks)
+
 if __name__ == '__main__':
-    # with open('input.txt', 'r') as rock_scan: # 
-    with open('test_input.txt', 'r') as rock_scan: # expect 24, part 2 93
+    with open('input.txt', 'r') as rock_scan: # 
+    # with open('test_input.txt', 'r') as rock_scan: # expect 24, part 2 93
+    # with open('test_input2.txt', 'r') as rock_scan: # expect 24, part 2 93
         rock_map, x_offset = make_terrain(rock_scan)
-        draw_terrain(rock_map)
+        count_rocks(rock_map)
+        # draw_terrain(rock_map)
+
         sands = 0
         filling = True
         while filling:
-            sands+=1
             rock_map, filling = drop_sand(rock_map, x_offset)
-            if sands%10==0:
-                draw_terrain(rock_map)
+            if not filling:
+                break
+            sands+=1
+            # if sands==24:
+            #     break
+            # if sands==644:
+            #     break
+            # if sands%50==0:
+            #     draw_terrain(rock_map)
         draw_terrain(rock_map)
-        print(sands)
+        print(sands) #27325 is too high
 
-        # stream_diagnostic(pairs) #5922 is too low
+        # a solid triangle would be 29241
+        # 29241-27235 = 2006 non-sandy squares
+        # count_rocks prints 945
+        # so i've got 1061 voids inside the sand pile? 
+
+
 

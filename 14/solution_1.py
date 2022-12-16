@@ -96,5 +96,3 @@ if __name__ == '__main__':
         draw_terrain(rock_map)
         print(sands)
 
-        # stream_diagnostic(pairs) #5922 is too low
-
