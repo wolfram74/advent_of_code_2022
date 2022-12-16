@@ -82,10 +82,10 @@ def drop_sand(field, x_offset):
     return field
 
 if __name__ == '__main__':
-    # with open('input.txt', 'r') as rock_scan: # 
-    with open('test_input.txt', 'r') as rock_scan: # expect 24
+    with open('input.txt', 'r') as rock_scan: # 
+    # with open('test_input.txt', 'r') as rock_scan: # expect 24
         rock_map, x_offset = make_terrain(rock_scan)
-        draw_terrain(rock_map)
+        # draw_terrain(rock_map)
         sands = 0
         while True:
             try:
