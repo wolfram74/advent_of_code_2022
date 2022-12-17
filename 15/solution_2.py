@@ -108,7 +108,7 @@ def composite_range_builder(beacon_pairs, x_bounds, row_check):
             if not stitched:
                 output.append(range0)
         ranges = output
-        # print(output, last_try)
+        # print(output, last_try, row_check)
         if output == last_try:
             break
         if len(output) == 1:
@@ -158,12 +158,15 @@ if __name__ == '__main__':
         sensor_beacon_pairs, space = parse_input(sensor_positions)
         search_bound = 20
         source = []
+        print('starting loop')
         for row_query in range(search_bound+1):
+            print(row_query)
             # rejects = rule_outs(sensor_beacon_pairs, space[0], row_query)
             # beacons_in_row = beacon_check(sensor_beacon_pairs, row_query)
             ruled_out = composite_range_builder(sensor_beacon_pairs, space[0], row_query)
             if len(ruled_out) < 2:
                 continue
+            print(row_query, source)
             if ruled_out[0][1]+1 == ruled_out[1][0]:
                 continue
             source.append([row_query, ruled_out])
@@ -187,27 +190,23 @@ if __name__ == '__main__':
 
         sensor_beacon_pairs, space = parse_input(sensor_positions)
         search_bound = 4000000
-
+        source = []
         print(space)
         for row_query in range(search_bound+1):
+            if row_query%(10**4) == 0:
+                print(row_query)
             ruled_out = composite_range_builder(sensor_beacon_pairs, space[0], row_query)
             if len(ruled_out) < 2:
                 continue
             if ruled_out[0][1]+1 == ruled_out[1][0]:
                 continue
             source.append([row_query, ruled_out])
+        print(source)
         source = source[0]
         y = source[0]
         x = (source[1][0][1]+1)
         total = x*4000000+y
         print(total)
-
-        # rejects = rule_outs(sensor_beacon_pairs, space[0], row_query)
-        # beacons_in_row = beacon_check(sensor_beacon_pairs, row_query)
-        # print(rejects, beacons_in_row)
-        # total = rejects-beacons_in_row
-        # print(total) #4406715 is too low
-        # synthetic bound approach also yields 4406715
-        # not limiting space to places where things already are gets 5367037 and the right answer
-
+        # 12997154978645 is too high
+        # 11914583249288
 
