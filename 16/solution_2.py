@@ -175,6 +175,7 @@ def solution(file_name):
     valves = parse_file(file_name)
     path_caching2(valves)
     plan_coordinator = Plan(valves)
+    print('there are %d flow positive valves' % len(plan_coordinator.flowing.keys()))
     # print(print_distance_matrix(valves))
     # if len(valves.keys())> 20:
     #     exit()
@@ -182,7 +183,7 @@ def solution(file_name):
     steps = 0
     # while plan_coordinator.plans:
     for i in range(7):
-        plan_coordinator.advance_step(branching_factor=3)
+        plan_coordinator.advance_step(branching_factor=8)
         steps += 1
         print(steps, len(plan_coordinator.plans))
     plan_coordinator.rank_plans()
@@ -196,7 +197,7 @@ def solution(file_name):
     #     # print(plan_coordinator.evaluate_plan(plan), plan)
     #     print(plan_coordinator.evaluate_plan(plan))
     # print(len(plan_coordinator.plans), len(plan_coordinator.finished_plans))
-
+    print(plan_coordinator.finished_plans[0])
     return plan_coordinator.evaluate_plan(plan_coordinator.finished_plans[0])
 
 def print_distance_matrix(valves):
@@ -211,10 +212,54 @@ def print_distance_matrix(valves):
 
 if __name__ == '__main__':
     
-    if not solution('test_input.txt') == 1707:
-        print('test failed, stopping')
-        exit()
+    # if not solution('test_input.txt') == 1707:
+    #     print('test failed, stopping')
+    #     exit()
+    # if not solution('test_input2.txt') == (30*24+29*23):
+    #     print('test failed, stopping')
+    #     exit()
+    # if not solution('test_input3.txt') == (30*24+29*23+25*22):
+    #     print('test failed, stopping')
+    #     exit()
+    # if not solution('test_input4.txt') == 1707:
+    #     print('test failed, stopping')
+    #     exit()
+
     print('test passing, onto full')
     # exit()
     print(solution('input.txt'))
+    # part 1 best 1896
+    # bf 5 -> 1794
+    # bf 6 -> 1803
+    # bf 7 -> 1828
+    # plan = [(0, 'AA', 0, 'AA'), (5, 'JO', 0, 'AA'), (9, 'KP', 0, 'AA'), (9, 'KP', 7, 'EV'), (9, 'KP', 11, 'FB'), (16, 'CN', 11, 'FB'), (19, 'HB', 11, 'FB')]
+    # bf 8 -> 1828
+    # plan = [(0, 'AA', 0, 'AA'), (5, 'JO', 0, 'AA'), (9, 'KP', 0, 'AA'), (9, 'KP', 7, 'EV'), (9, 'KP', 11, 'FB'), (16, 'CN', 11, 'FB'), (19, 'HB', 11, 'FB')]
+
+    # bf 9 -> 1828 too low
+    # bf 10 -> 1828 
+    # bf 11 -> 1828 X
+    # bf 12 -> 1828 X
+    # bf 13 -> 1828 x
+    # bf 14 -> 1828 x
+    # bf 15 -> 1828 god damn it
+
+'''
+1 14
+2 196
+3 2728
+4 35483
+5 405387
+6 4155731
+7 39767211
+
+1 15
+2 225
+3 3346
+4 46148
+5 557803
+6 6057606
+7 61493639
+
+'''
 
