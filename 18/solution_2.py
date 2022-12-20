@@ -39,31 +39,71 @@ def parse_file(file_name):
 def void_check(blob, bounds):
     print(bounds)
     enclosed_voids = 0
-    voids = {}
+    compound_candidates = [{} for i in range(7)]
     for x in range(bounds[0]):
         for y in range(bounds[1]):
             for z in range(bounds[2]):
                 location = (x,y,z)
                 if location in blob:
                     continue
-                if is_enclosed(blob, location):
+                void_neighbors = find_connected_voids(blob, location)
+                # print(location, void_neighbors, len(void_neighbors))
+                if len(void_neighbors) == 0:
                     enclosed_voids += 1
+                    continue
+                compound_candidates[len(void_neighbors)][location]=void_neighbors
+                # if is_enclosed(blob, location):
+    examine_compouds(compound_candidates)
+    # print(enclosed_voids)
+    return [enclosed_voids, 0]
 
-    print(enclosed_voids)
-    return enclosed_voids
-
-def is_enclosed(blob, location):
+def find_connected_voids(blob, location):
+    void_neighbors = []
     for direction in directions:
         check = vector_add(direction,location)
+        if -1 in check:
+            continue
         if not check in blob:
             # print(location,check)
-            return False
-    # print(location)
-    return True
+            void_neighbors.append(check)
+            continue
+            # return False
+    # if len(void_neighbors) == 6:
+    #     return False, []
+    # print(location, void_neighbors)
+    return void_neighbors
+
+def examine_compouds(void_groups):
+    voids_in_clusters = set()
+    void_clusters = []
+    for ind, level in enumerate(void_groups):
+        print(ind, len(level.keys()))
+        # if ind >4:
+        #     continue
+        for void in level.keys():
+            if void in voids_in_clusters:
+                continue
+            new_cluster = set()
+            new_cluster.add(void)
+            for neighbor in level[void]:
+                if neighbor in voids_in_clusters:
+                    continue
+                new_cluster.add(neighbor)
+                voids_in_clusters.add(neighbor)
+            void_clusters.append(new_cluster)
+            # if ind == 3:
+
+            if len(new_cluster) > 3:
+                continue
+            print('new cluster', len(new_cluster), '\n', new_cluster)
+
+        #     print(ind, void)
+    print('compounds', len(void_clusters))
 
 def solution(file_name):
     blob, bounds = parse_file(file_name)
     tally = 0
+    print(len(blob.keys()), bounds[0]*bounds[1]*bounds[2])
     for vector in blob.keys():
         # print(vector)
         for direction in directions:
@@ -71,7 +111,12 @@ def solution(file_name):
             if check in blob:
                 blob[vector][1] -= 1
         tally += blob[vector][1]
-    tally -= 6*void_check(blob, bounds)
+    void_census = void_check(blob, bounds)
+    tally -= (6*void_census[0]+5*void_census[1])
+    # failing on larger input, guess was too high
+    # if anything, I feel like mine would under shoot in case where two void voxels were adjacent
+    # that's exactly what it's missing, multi-voxel voids would register as external space by this check
+    print(tally)
     return tally
 
 
