@@ -3,7 +3,14 @@ so the path can't be longer than 30 steps regardless, and any openings shortens 
 the branching factor in the actual input is pretty always at least 2, sometimes much higher
 also a lot of the nodes have no output so the paths will be on the long side
 don't think we can naively generate every path see what works best
+speed up options:
+-data structure in best_next that mitigates sorting?
+-some kind of preprocessing that stores the possible values each node could have at each point in 26 time?
+    unlikely as the function for it's value is very cheap as, probably not more expensive than calcuating the look up address
+-don't think we can have each player make a move at once because sometimes a player will make two moves before the other one does
 '''
+
+
 import re
 
 
@@ -17,6 +24,8 @@ class Valve:
         self.flow = int(re.findall(flow_reg, string)[0])
         self.neighbors = ids[1:]
         self.paths = {self.ID:[]}
+        self.best_bart = {}
+        self.best_stampy = {}
         for val in self.neighbors:
             self.paths[val] = [val]
 
@@ -46,6 +55,7 @@ class Plan:
             valve = self.valves[key]
             if valve.flow > 0:
                 self.flowing[key] = valve.flow
+        self.valve_set = set(self.flowing.keys())
 
     def best_next(self, branching_factor, plan, debug=False):
         # first pass at trying to have bart and stampy team up
@@ -54,7 +64,7 @@ class Plan:
         stampy = self.valves[plan[-1][3]]
         bart_time = self.total_time-plan[-1][0]
         stampy_time = self.total_time-plan[-1][2]
-        valve_set = set(self.flowing.keys())
+        valve_set = self.valve_set
         bart_set = set([el[1] for el in plan])
         stampy_set = set([el[3] for el in plan])
         unvisited = (
@@ -152,7 +162,7 @@ class Plan:
 
     def prune_bottom_two_thirds(self):
         contenders = len(self.plans)
-        keep_index = int(contenders/3)
+        keep_index = int(contenders/10)
         self.rank_plans()
         self.plans = self.plans[:keep_index]
         return
@@ -214,11 +224,14 @@ def solution(file_name):
     # print(print_distance_matrix(valves))
     # if len(valves.keys())> 20:
     #     exit()
-    # print(plan.best_next(branching_factor = 3, path = plan.paths[0]))
+    # print(
+    #     plan_coordinator.best_next(
+    #         branching_factor = 7, plan = plan_coordinator.plans[0], debug=True
+    #         ))
     steps = 0
     while plan_coordinator.plans:
     # for i in range(7):
-        plan_coordinator.advance_step(branching_factor=15)
+        plan_coordinator.advance_step(branching_factor=30)
         steps += 1
         print('%02d' % steps, len(plan_coordinator.plans), len(plan_coordinator.finished_plans))
         if len(plan_coordinator.plans) > 10**6:
@@ -241,7 +254,8 @@ def solution(file_name):
     # print(plan_coordinator.finished_plans[0])
     winner = plan_coordinator.finished_plans[0]
     # plan_coordinator.decile_report()
-    # plan_coordinator.best_next(branching_factor=8, plan = winner, debug=True)
+    print(winner)
+    plan_coordinator.best_next(branching_factor=8, plan = winner, debug=True)
     return plan_coordinator.evaluate_plan(winner)
 
 def print_distance_matrix(valves):
@@ -256,9 +270,9 @@ def print_distance_matrix(valves):
 
 if __name__ == '__main__':
     
-    # if not solution('test_input.txt') == 1707:
-    #     print('test failed, stopping')
-    #     exit()
+    if not solution('test_input.txt') == 1707:
+        print('test failed, stopping')
+        exit()
     # if not solution('test_input2.txt') == (30*24+29*23):
     #     print('test failed, stopping')
     #     exit()
@@ -284,7 +298,14 @@ if __name__ == '__main__':
     # bf 12 -> 2483 wrong
     # bf 13 -> 2483 x
     # bf 14 -> 2483 x
-    # bf 15 -> 2339
+    # bf 15 -> 2483 x
+    # bf 16 -> 2339
+    # bf 17 -> 2339
+    # bf 18 -> 2339
+    # bf 19 -> 2339
+    # bf 20 -> 2339
+    # bf 30 -> 2576 90% pruning
+# oh god damn the branching factor can go up to 30
 '''
 1 14
 2 196
