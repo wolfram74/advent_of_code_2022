@@ -6,6 +6,10 @@ probably best to make a 3-d list and just do neighbor occupancy checks
 void detection:
 get the bounds of obsidian, suspect only positive numbers
 second pass on blob generation, iterate over all space and if there's an existent blob nearby, add it to void list
+take 2 on void detection:
+while generating blob, also generate voids
+do the same algorithm to get rid of voids with no neighbors
+then do bfs to get others and do something like the surface area calculation
 '''
 def vector_add(v1, v2):
     return tuple([sum(el) for el in zip(v1, v2)])
@@ -18,7 +22,6 @@ directions  = [
     (0,0,1),
     (0,0,-1),
 ]
-
 
 def parse_file(file_name):
     blob = {}
@@ -38,67 +41,101 @@ def parse_file(file_name):
 
 def void_check(blob, bounds):
     print(bounds)
-    enclosed_voids = 0
-    compound_candidates = [{} for i in range(7)]
+    empty_cubes = set()
     for x in range(bounds[0]):
         for y in range(bounds[1]):
             for z in range(bounds[2]):
                 location = (x,y,z)
                 if location in blob:
                     continue
-                void_neighbors = find_connected_voids(blob, location)
-                # print(location, void_neighbors, len(void_neighbors))
-                if len(void_neighbors) == 0:
-                    enclosed_voids += 1
-                    continue
-                compound_candidates[len(void_neighbors)][location]=void_neighbors
-                # if is_enclosed(blob, location):
-    examine_compouds(compound_candidates)
-    # print(enclosed_voids)
-    return [enclosed_voids, 0]
-
-def find_connected_voids(blob, location):
-    void_neighbors = []
-    for direction in directions:
-        check = vector_add(direction,location)
-        if -1 in check:
+                empty_cubes.add(location)
+    clusters = form_clusters(empty_cubes)
+    internal_penalties = []
+    for cluster in clusters:
+        if (0,0,0) in cluster:
+            print('rejected len %d cluster, obviously outside' % len(cluster))
+            area_check(blob, cluster)
             continue
-        if not check in blob:
-            # print(location,check)
-            void_neighbors.append(check)
-            continue
-            # return False
-    # if len(void_neighbors) == 6:
-    #     return False, []
-    # print(location, void_neighbors)
-    return void_neighbors
-
-def examine_compouds(void_groups):
-    voids_in_clusters = set()
-    void_clusters = []
-    for ind, level in enumerate(void_groups):
-        print(ind, len(level.keys()))
-        # if ind >4:
+        if len(cluster) > 4:
+            if bound_check(cluster, bounds):
+                print('rejected len %d cluster' % len(cluster))
+                continue
+        # if tuple(bounds) in cluster:
         #     continue
-        for void in level.keys():
-            if void in voids_in_clusters:
+        # if vector_add(bounds,(-1,-1,-1)) in cluster:
+        #     continue
+        # print(cluster)
+        internal_penalties.append(area_check(blob, cluster))
+    # print(empty_cubes)
+    # print(enclosed_voids)
+    return internal_penalties
+
+def form_clusters(spaces):
+    '''
+    choose a node at random, make a 
+    generate list of guesses
+    work on 
+    '''
+    # print(len(spaces))
+    visited_spaces = set()
+    clusters = []
+    while len(spaces) > 0:
+        start = spaces.pop()
+        if start in visited_spaces:
+            continue
+
+        cluster = set()
+        frontier = [start]
+        while len(frontier) > 0:
+            # print(len(frontier))
+            inspect = frontier.pop(0)
+            if inspect in visited_spaces:
                 continue
-            new_cluster = set()
-            new_cluster.add(void)
-            for neighbor in level[void]:
-                if neighbor in voids_in_clusters:
+            for direction in directions:
+                new_point = vector_add(inspect, direction)
+                if not new_point in spaces:
                     continue
-                new_cluster.add(neighbor)
-                voids_in_clusters.add(neighbor)
-            void_clusters.append(new_cluster)
-            # if ind == 3:
+                if new_point in visited_spaces:
+                    continue
+                if new_point in frontier:
+                    continue
+                frontier.append(new_point)
+                # visited_spaces.add(new_point)
+            cluster.add(inspect)
+            visited_spaces.add(inspect)
+        clusters.append(cluster)
+    # for cluster in clusters:
+        # print(cluster, len(cluster))
+        # print(len(cluster))
+    return clusters
 
-            if len(new_cluster) > 3:
-                continue
-            print('new cluster', len(new_cluster), '\n', new_cluster)
+def area_check(blob, void):
+    penalty = 0
+    for point in void:
+        for direction in directions:
+            check = vector_add(direction, point)
+            if check in blob:
+                penalty+=1
+    print('void size, penalty', len(void), penalty)
+    return penalty
 
-        #     print(ind, void)
-    print('compounds', len(void_clusters))
+def bound_check(blob, bounds):
+    mins = [100,100,100]
+    maxs = [0,0,0]
+    for point in blob:
+        if point[0] in (0, bounds[0]-1):
+            return True
+        if point[1] in (0, bounds[1]-1):
+            return True
+        if point[2] in (0, bounds[2]-1):
+            return True
+        for i in range(3):
+            if point[i] > maxs[i]:
+                maxs[i] = point[i]
+            if point[i] < mins[i]:
+                mins[i] = point[i]
+    print('bounds of big void', mins, maxs)
+    return False
 
 def solution(file_name):
     blob, bounds = parse_file(file_name)
@@ -112,7 +149,8 @@ def solution(file_name):
                 blob[vector][1] -= 1
         tally += blob[vector][1]
     void_census = void_check(blob, bounds)
-    tally -= (6*void_census[0]+5*void_census[1])
+    # void_clusters = find_voids(blob, bounds)
+    tally -= sum(void_census)
     # failing on larger input, guess was too high
     # if anything, I feel like mine would under shoot in case where two void voxels were adjacent
     # that's exactly what it's missing, multi-voxel voids would register as external space by this check
@@ -131,3 +169,6 @@ if __name__ == '__main__':
     print(solution('input.txt'))
     # part 1 4310
     # 4040 too high
+    # 2441 too low
+    # 2341
+    # 3985 too high
