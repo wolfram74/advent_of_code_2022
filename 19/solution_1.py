@@ -8,6 +8,10 @@ every turn we have a choice to spend resources to increase our bot supply by one
 we could model trajectories turn by turn, or we could model them based on what options are available
 ie: at turn 0 we could decide to wait 4 turns to start on an ore bot or wait 2 turns to start on a claybot
 tree structure, nodes are factory states, branching factor at most 4,
+
+new tack avoiding recursion:
+ just treat them like 9 dimensional points in configuration space, do a normal frontier set/candidate set thing
+ iterative, cuts out redundant checks that are path agnostic
 '''
 def vector_add(v1, v2):
     return tuple([sum(el) for el in zip(v1, v2)])
