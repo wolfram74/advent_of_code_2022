@@ -5,6 +5,11 @@ also a lot of the nodes have no output so the paths will be on the long side
 don't think we can naively generate every path see what works best
 '''
 import re
+def vector_add(v1, v2):
+    return tuple([sum(el) for el in zip(v1, v2)])
+
+def vector_diff(v1, v2):
+    return tuple([el[0]-el[1] for el in zip(v1, v2)])
 
 
 class Valve:

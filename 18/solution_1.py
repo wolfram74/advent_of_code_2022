@@ -9,7 +9,7 @@ def vector_add(v1, v2):
 
 
 def parse_file(file_name):
-    blob = {}
+    blob = {}3
     with open(file_name, 'r') as vectors:
         for vector in vectors.readlines():
             location = tuple(int(el) for el in vector.rstrip().split(','))
