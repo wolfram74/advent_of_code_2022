@@ -24,14 +24,21 @@ def expand_list(input_list, expression_dict):
     layer_lookups = False
     for index, term in enumerate(input_list):
         if type(term)==list:
-            output_list[index], layer_lookups = expand_list(term, expression_dict)
+            results = expand_list(term, expression_dict)
+            output_list[index], layer_lookups = results[0], (layer_lookups or results[1])
+            # print('found sublist', term, layer_lookups)
+            # print('found sublist', term)
             continue
         if not term in expression_dict:
             output_list[index] = term
             continue
         output_list[index] = expression_dict[term]
         lookups = True
-    return output_list, lookups or layer_lookups
+    # print('call status')
+    # print(input_list)
+    # print(output_list)
+    # print(lookups, layer_lookups, '|', (lookups or layer_lookups))
+    return output_list, (lookups or layer_lookups)
 
 operations = {
     '+': (lambda x,y: x+y),
@@ -66,7 +73,9 @@ def solution(file_name):
     #     if not term in expression_dict:
     #         continue
     #     expression_dict['root'][index] = expression_dict[term]
-    for i in range(5):
+    lookups = True
+    # for i in range(6):
+    while lookups:
         expression_dict['root'], lookups = expand_list(expression_dict['root'], expression_dict)
         print(lookups)
     root_value = collapse_tree(expression_dict['root'])
@@ -80,7 +89,7 @@ if __name__ == '__main__':
         exit()
 
     print('test passing, onto full')
-    exit()
+    # exit()
     print(solution('input.txt'))
     # part 1 4310
     # 4040 too high
