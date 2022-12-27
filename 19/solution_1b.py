@@ -59,6 +59,9 @@ class Factory:
         robots = list(state[-4:])
         for name in self.costs.keys():
             # print(name)
+            if name == 'orebot':
+                if robots[0]>=4:
+                    continue
             needs = self.costs[name]
             buildable = True
             for index in range(len(needs)):
@@ -86,7 +89,9 @@ class Factory:
             deficit = cost[index]-resources[index]
             if deficit < 0:
                 continue
-            limiting_time = ceil(deficit/robots[index])
+            possible_limit = ceil(deficit/robots[index])
+            if possible_limit > limiting_time:
+                limiting_time = possible_limit
         return limiting_time+1
 
     def generate_next_options(self):
@@ -126,6 +131,9 @@ class Factory:
                 list(next_robots))
             if next_state in self.visited_states:
                 continue
+            if next_state[1]==0:
+                print(present, next_state)
+                exit()
             self.frontier.add(next_state)
 
             # for turn in range(move_duration):
@@ -202,16 +210,38 @@ def test_generate_next_options(test_factory):
             check in test_factory.visited_states,
             check in test_factory.terminal_states)
 
+def find_best_result(factory):
+    while factory.frontier:
+        factory.generate_next_options()
+        if len(factory.visited_states)%1000000==0:
+            print(
+                len(factory.visited_states),
+                len(factory.frontier),
+                len(factory.terminal_states)
+                )
+    best = 0
+    for end_state in factory.terminal_states:
+        results = factory.max_geode_production(end_state)
+        if results > best:
+            best = results
+            # print(end_state, best)
+    return best
 
 def solution(file_name):
     blueprints = parse_file(file_name)
     # print(blueprints)
     # resource vector ore, clay, obsidian, geode
-    bots = [1,0,0,0]
-    test_factory = Factory(blueprints[0][0], blueprints[0][1])
-    # test_factory_options(test_factory)
-    test_generate_next_options(test_factory)
-
+    # bots = [1,0,0,0]
+    # test_factory = Factory(blueprints[0][0], blueprints[0][1])
+    # # test_factory_options(test_factory)
+    # test_generate_next_options(test_factory)
+    quality_scores = 0
+    for design in blueprints:
+        candidate_factory = Factory(design[0], design[1])
+        geodes = find_best_result(candidate_factory)
+        print(design[0], geodes)
+        quality_scores+= geodes*design[0]
+    return quality_scores
 
 if __name__ == '__main__':
     
