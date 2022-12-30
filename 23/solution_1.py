@@ -21,10 +21,8 @@ class Elf:
 def vector_add(v1, v2):
     return tuple([sum(el) for el in zip(v1, v2)])
 
-
-
-
-
+def settify_elves(elves):
+    return set([elf.coords for elf in elves])
 
 directions = [
     (1,0), #east
@@ -138,8 +136,10 @@ def solution(file_name):
         # print(search_queue[0], len(search_queue))
         print(loop+1)
         elf_survey(elf_list)
-
     return 0
+
+
+
 if __name__ == '__main__':
     
     if not solution('test_input2.txt') == 25:
