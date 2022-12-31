@@ -89,6 +89,7 @@ class Diag2Case(unittest.TestCase):
         self.assertEqual(set([(1,-1),(0,2)]), solution_1.settify_elves(elf_list))
 
 class FiveElfCase(unittest.TestCase):
+    @unittest.skip("passing")
     def test_bulk_movement(self):
         turn_0 = solution_1.parse_file('test_input2.txt') 
         after1_turn, movers = solution_1.take_turn(turn_0, 0)
@@ -117,6 +118,47 @@ class FiveElfCase(unittest.TestCase):
         self.assertEqual(solution_1.settify_elves(after3_turn), set_3)
         self.assertEqual(solution_1.settify_elves(after4_turn), set_3)
 
+class MediumSizeCase(unittest.TestCase):
+    def test_bulkier_movement(self):
+        elves = solution_1.parse_file('test_input1a.txt')
+
+        true_turn_1 = solution_1.parse_file('test_input1b.txt')
+        set_1 = solution_1.settify_elves(true_turn_1)
+        elves, movers = solution_1.take_turn(elves, 0)
+        self.assertEqual(solution_1.settify_elves(elves), set_1)
+
+
+        true_turn_2 = solution_1.parse_file('test_input1c.txt')
+        set_2 = solution_1.settify_elves(true_turn_2)
+        elves, movers = solution_1.take_turn(elves, 1)
+        self.assertEqual(solution_1.settify_elves(elves), set_2)
+        
+        true_turn_3 = solution_1.parse_file('test_input1d.txt')
+        set_3 = solution_1.settify_elves(true_turn_3)
+        elves, movers = solution_1.take_turn(elves, 2)
+        self.assertEqual(solution_1.settify_elves(elves), set_3)
+        
+        true_turn_4 = solution_1.parse_file('test_input1e.txt')
+        set_4 = solution_1.settify_elves(true_turn_4)
+        elves, movers = solution_1.take_turn(elves, 3)
+        self.assertEqual(solution_1.settify_elves(elves), set_4)
+        
+        true_turn_5 = solution_1.parse_file('test_input1f.txt')
+        set_5 = solution_1.settify_elves(true_turn_5)
+        elves, movers = solution_1.take_turn(elves, 4)
+        self.assertEqual(solution_1.settify_elves(elves), set_5)
+
+        elves, movers = solution_1.take_turn(elves, 5)
+        elves, movers = solution_1.take_turn(elves, 6)
+        elves, movers = solution_1.take_turn(elves, 7)
+        elves, movers = solution_1.take_turn(elves, 8)
+        elves, movers = solution_1.take_turn(elves, 9)
+        true_turn_10 = solution_1.parse_file('test_input1_end.txt')
+        self.assertEqual(
+            solution_1.settify_elves(elves), 
+            solution_1.settify_elves(true_turn_10)
+            )
+        
 
 if __name__ == '__main__':
     unittest.main()

@@ -124,6 +124,23 @@ def take_turn(elves, turn_number):
 
     return elves, movers
 
+def bounding_box(elves):
+    minY = 10**6
+    maxY = -10**6
+    minX = 10**6
+    maxX = -10**6
+    for elf in elves:
+        x, y = elf.coords
+        if x > maxX:
+            maxX = x
+        if x < minX:
+            minX = x
+        if y > maxY:
+            maxY = y
+        if y < minY:
+            minY = y
+    return maxX-minX+1, maxY-minY+1
+
 def elf_survey(elves):
     print([elf.coords for elf in elves])
     # test_input2
@@ -138,14 +155,21 @@ def solution(file_name):
     elf_list = parse_file(file_name)
     # print(elf_list)
     elf_survey(elf_list)
-    for loop in range(5):
+    loop = 0
+    movers = len(elf_list)
+    # for loop in range(5):
+    while movers:
+        print(loop)
         elf_list, movers = take_turn(elf_list, loop)
         # print(movers)
         # search_queue.append(search_queue.pop(0))
         # print(search_queue[0], len(search_queue))
-        print(loop+1)
-        elf_survey(elf_list)
-    return 0
+        loop += 1
+        print(loop, movers)
+    elf_survey(elf_list)
+    width, height = bounding_box(elf_list)
+    print(width, height, 'bounds', len(elf_list))
+    return (width*height)-len(elf_list)
 
 
 
@@ -159,5 +183,5 @@ if __name__ == '__main__':
         exit()
 
     print('test passing, onto full')
-    # exit()
+    exit()
     print(solution('input.txt'))
