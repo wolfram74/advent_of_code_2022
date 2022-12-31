@@ -48,6 +48,7 @@ class Factory:
             0,0,0,0,
             1,0,0,0,
             ))
+        self.most_geode = 0
 
     def options(self, state):
         possible = []
@@ -58,7 +59,7 @@ class Factory:
                 if robots[0]>=3:
                     continue
             if name == 'claybot':
-                if robots[1]>=9:
+                if robots[1]>=11:
                     continue
             needs = self.costs[name]
             buildable = True
@@ -70,7 +71,7 @@ class Factory:
                     break
             if buildable:
                 possible.append(name)
-        return possible
+        return self.optimize_options(state, possible)
 
     def minimum_build_time(self, target, state):
         cost = self.costs[target]
@@ -92,6 +93,43 @@ class Factory:
                 limiting_time = possible_limit
         return limiting_time+1
 
+    def optimize_options(self, state, options):
+        trimmed_options = options
+        # if you could buy an obsi before geode, ignore buying a geode
+        # if you could buy a clay before obsi
+        # print('raw', options)
+        if len(options) == 1:
+            return options
+        if options == ['orebot', 'claybot']:
+            return options
+        time_to_clay = self.minimum_build_time('claybot', state)
+        time_to_obsi = self.minimum_build_time('obsibot', state)
+        if options[-1]=='geodbot':
+            # return options
+            time_to_geode = self.minimum_build_time('geodbot', state)
+            # time_to_obsi = self.minimum_build_time(options[-2], state)
+            delta = time_to_geode-time_to_obsi
+            # delta_clay = time_to_obsi-time_to_clay
+            if delta == 0:
+                return options
+            if delta*state[5]>3:
+                trimmed_options.pop()
+        delta_clay = time_to_obsi-time_to_clay
+        if delta_clay == 0:
+            return trimmed_options
+        if delta_clay*state[5]>3:
+            trimmed_options.pop()
+    
+        # if delta_clay
+            # print('trimmed')
+            # return trimmed_options
+
+        # print('----------', options, state, delta)
+        # print(self.costs['obsibot'])
+        # print(self.costs['geodbot'])
+        return options
+
+
     def generate_next_options(self):
         '''
         1) find the possible next builds
@@ -104,8 +142,12 @@ class Factory:
         '''
         present = self.frontier.pop()
         self.visited_states.add(present)
+        fantasy_output = self.fantasy_geode_production(present)
+        if fantasy_output < self.most_geode:
+            return
         present = numpy.array(present)
         next_moves = self.options(present)
+        # print('optimized', next_moves)
         time = present[0]
         robots = present[-4:]
         resources = present[1:5]
@@ -141,12 +183,25 @@ class Factory:
             # for turn in range(move_duration):
             #     resource_delta = vector_add(resource_delta, self.robots)
 
+
     def max_geode_production(self,state):
         # if self.robots[3]==0:
         #     return 0
         time_left = 32-state[0]
         return state[-1]*time_left+state[4]
 
+    def fantasy_geode_production(self, state):
+        time_left = 32-state[0]
+        triangle = int(time_left*(time_left+1)/2)
+        return state[4]*time_left+state[-1]+triangle
+
+    def trim_finals(self):
+        # print(len(self.terminal_states))
+        while self.terminal_states:
+            end_state = self.terminal_states.pop()
+            geodes = self.max_geode_production(end_state)
+            if geodes > self.most_geode:
+                self.most_geode = geodes
 
 def parse_file(file_name):
     cost = re.compile(r'(\d+)')
@@ -216,15 +271,16 @@ def find_best_result(factory):
             print(
                 len(factory.visited_states),
                 len(factory.frontier),
-                len(factory.terminal_states)
+                factory.most_geode
                 )
-    best = 0
-    for end_state in factory.terminal_states:
-        results = factory.max_geode_production(end_state)
-        if results > best:
-            best = results
-            # print(end_state, best)
-    return best
+        factory.trim_finals()
+    # best = 0
+    # for end_state in factory.terminal_states:
+    #     results = factory.max_geode_production(end_state)
+    #     if results > best:
+    #         best = results
+    #         # print(end_state, best)
+    return factory.most_geode
 
 def solution(file_name):
     blueprints = parse_file(file_name)
@@ -246,10 +302,11 @@ def solution(file_name):
 
 if __name__ == '__main__':
     
-    if not solution('test_input.txt') == 62*56:
-        print('test failed, stopping')
-        exit()
+    # if not solution('test_input.txt') == 62*56:
+    #     print('test failed, stopping')
+    #     exit()
 
     print('test passing, onto full')
     # exit()
-    print(solution('input.txt'))
+    print(solution('input.txt')) 
+    # 1760, 4, 44, 10 # too low
