@@ -24,6 +24,8 @@ def vector_add(v1, v2):
 def settify_elves(elves):
     return set([elf.coords for elf in elves])
 
+
+
 directions = [
     (1,0), #east
     (-1,0), # west
@@ -55,10 +57,13 @@ def parse_file(file_name):
     raw_coords=[]
     y_val = 0
     with open(file_name, 'r') as terrain:
+        # print('----- reading', file_name )
         for line in terrain.readlines():
+            # print(line.rstrip())
             for x_val in range(len(line.rstrip())):
                 if line[x_val] == '.':
                     continue
+                # print('found elf at ', x_val)
                 raw_coords.append(
                     (x_val, y_val)
                     )
@@ -68,13 +73,14 @@ def parse_file(file_name):
         output.append(Elf(coords, index))
     return output
 
-def take_turn(elves):
+def take_turn(elves, turn_number):
     current_location = set([elf.coords for elf in elves])
 
     # check for moving
     movers = 0
     for elf in elves:
         elf.moving = False
+        elf.bounced = False
         for direction in directions:
             neighbor = vector_add(direction, elf.coords)
             if neighbor in current_location:
@@ -88,10 +94,13 @@ def take_turn(elves):
     for index, elf in enumerate(elves):
         if not elf.moving:
             continue
-        for attempt in search_queue:
-            new_move, success = hesitant_move(elf, current_location, attempt)
+        for attempt in range(len(search_queue)):
+            searches = search_queue[(attempt+turn_number)%4]
+            new_move, success = hesitant_move(elf, current_location, searches)
+            if new_move == (2,4):
+                print(elf.coords, attempt)
             if success:
-                print(elf.ID, attempt[0])
+                # print(elf.ID, searches[0])
                 break
         if new_move in proposed_moves:
             elf.bounced = True
@@ -107,7 +116,7 @@ def take_turn(elves):
     # implement moves
     for move in proposed_moves.keys():
         elf_id = proposed_moves[move]
-        print(elf_id, move)
+        print(elf_id, elves[elf_id].coords, move, )
         if elves[elf_id].bounced:
             continue
         elves[elf_id].coords = move
@@ -130,9 +139,9 @@ def solution(file_name):
     # print(elf_list)
     elf_survey(elf_list)
     for loop in range(5):
-        elf_list, movers = take_turn(elf_list)
+        elf_list, movers = take_turn(elf_list, loop)
         # print(movers)
-        search_queue.append(search_queue.pop(0))
+        # search_queue.append(search_queue.pop(0))
         # print(search_queue[0], len(search_queue))
         print(loop+1)
         elf_survey(elf_list)
