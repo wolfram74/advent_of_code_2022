@@ -49,6 +49,22 @@ class Factory:
             1,0,0,0,
             ))
         self.most_geode = 0
+        self.biggest_costs = {
+            'orebot': 0,
+            'claybot': 0,
+            'obsibot': 0,
+            'geodbot': 0,
+        }
+        for name in self.costs.keys():
+            recipe = self.costs[name]
+            for resource in range(4):
+                if recipe[0] > self.biggest_costs['orebot']:
+                    self.biggest_costs['orebot'] = recipe[0]
+                if recipe[1] > self.biggest_costs['claybot']:
+                    self.biggest_costs['claybot'] = recipe[1]
+                if recipe[2] > self.biggest_costs['obsibot']:
+                    self.biggest_costs['obsibot'] = recipe[2]
+
 
     def options(self, state):
         possible = []
@@ -56,10 +72,13 @@ class Factory:
         for name in self.costs.keys():
             # print(name)
             if name == 'orebot':
-                if robots[0]>=3:
+                if robots[0]>=self.biggest_costs['orebot']:
                     continue
             if name == 'claybot':
-                if robots[1]>=11:
+                if robots[1]>=self.biggest_costs['claybot']:
+                    continue
+            if name == 'obsibot':
+                if robots[2]>=self.biggest_costs['obsibot']:
                     continue
             needs = self.costs[name]
             buildable = True
@@ -201,6 +220,7 @@ class Factory:
             end_state = self.terminal_states.pop()
             geodes = self.max_geode_production(end_state)
             if geodes > self.most_geode:
+                print(end_state, geodes)
                 self.most_geode = geodes
 
 def parse_file(file_name):
@@ -302,7 +322,7 @@ def solution(file_name):
 
 if __name__ == '__main__':
     
-    # if not solution('test_input.txt') == 62*56:
+    # if not solution('test_input.txt') == 56*62:
     #     print('test failed, stopping')
     #     exit()
 
@@ -310,3 +330,4 @@ if __name__ == '__main__':
     # exit()
     print(solution('input.txt')) 
     # 1760, 4, 44, 10 # too low
+    # 2112, 4, 44, 12 # too low
